@@ -263,48 +263,86 @@ test.describe('POST /products', () => {
 
 test.describe('PUT /products/{id}', () => {
   test('Change whole product using PUT command should receive code 200', async ({ request }) => {
+    //Create new product
+    const newProduct = {
+      name: 'Cat',
+      category: 'Pets',
+      price: 300,
+    }
+    const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+      data: newProduct,
+    })
+    const createdProductBody = await postResponse.json()
+    const productStatusCode = postResponse.status()
+    const productId = createdProductBody.id
+    console.log('POST response status:', productStatusCode)
+    console.log('POST response body:', createdProductBody)
+    expect(productStatusCode).toBe(StatusCodes.CREATED)
+    //Change product
     const requestBody = {
-      name: 'New name',
-      category: 'New category',
+      name: 'Dog',
+      category: 'Food',
       price: 9.99,
     }
-    const response = await request.put('https://shop.tl-academy.ee/api/products/3', {
+    const putResponse = await request.put(`https://shop.tl-academy.ee/api/products/${productId}`, {
       data: requestBody,
     })
-    const responseBody = await response.json()
-    const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    const putResponseBody = await putResponse.json()
+    const statusCode = putResponse.status()
+    console.log('PUT response status:', statusCode)
+    console.log('PUT response body:', putResponseBody)
     expect(statusCode).toBe(200)
   })
 
-  test('Change one field in the product using PUT command should receive code 400', async ({
-    request,
-  }) => {
-    const requestBody = {
-      name: 'New name2',
+  test('Change one field in the product using PUT command should receive code 400', async ({request, }) => {
+    //Create new product
+    const newProduct = {
+      name: 'Mozzarella',
+      category: 'Cheese',
+      price: 31.86,
     }
-    const response = await request.put('https://shop.tl-academy.ee/api/products/3', {
+    const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+      data: newProduct,
+    })
+    const createdProductBody = await postResponse.json()
+    const productStatusCode = postResponse.status()
+    const productId = createdProductBody.id
+    console.log('POST response status:', productStatusCode)
+    console.log('POST response body:', createdProductBody)
+    expect(productStatusCode).toBe(StatusCodes.CREATED)
+    //Change product
+    const requestBody = {
+      name: 'Suluguni',
+    }
+    const response = await request.put(`https://shop.tl-academy.ee/api/products/${productId}`, {
       data: requestBody,
     })
     const responseBody = await response.json()
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('PUT response status:', statusCode)
+    console.log('PUT response body:', responseBody)
     expect(statusCode).toBe(400)
   })
 
-  test('Change whole product using PUT command with not existing id should receive code 404', async ({
-    request,
-  }) => {
+  test('Change whole product using PUT command with not existing id should receive code 404', async ({request, }) => {
+   //Get all products and the last one
+    const allProductResponse = await request.get('https://shop.tl-academy.ee/api/products')
+    const allProductBody= await allProductResponse.json()
+
+    const maxProductId = Math.max(...allProductBody.map((product: { id: number }) => product.id))
+    const nonExistingProductId = maxProductId + 1
+    //Change product
     const requestBody = {
-      name: 'New name3',
-      category: 'New category3',
-      price: 12.45,
+      name: 'Misha',
+      category: 'People',
+      price: 1000,
     }
-    const response = await request.put('https://shop.tl-academy.ee/api/products/54', {
-      data: requestBody,
-    })
+    const response = await request.put(
+      `https://shop.tl-academy.ee/api/products/${nonExistingProductId}`,
+      {
+        data: requestBody,
+      },
+    )
     const responseBody = await response.json()
     const statusCode = response.status()
     console.log('response status:', statusCode)
@@ -314,17 +352,34 @@ test.describe('PUT /products/{id}', () => {
 })
 
 test.describe('PATCH /products/{id}', () => {
+  //тест проходит, только почему-то категория становится пустой
   test('Changing one field using command PATCH should receive code 200', async ({ request }) => {
-    const requestBody = {
-      name: 'Patch name',
+    //Create new product
+    const newProduct = {
+      name: 'BMW',
+      category: 'Cars',
+      price: 0,
     }
-    const response = await request.patch('https://shop.tl-academy.ee/api/products/5', {
+    const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+      data: newProduct,
+    })
+    const createdProductBody = await postResponse.json()
+    const productStatusCode = postResponse.status()
+    const productId = createdProductBody.id
+    console.log('POST response status:', productStatusCode)
+    console.log('POST response body:', createdProductBody)
+    expect(productStatusCode).toBe(StatusCodes.CREATED)
+    //Change product
+    const requestBody = {
+      name: 'BMW e36',
+    }
+    const response = await request.patch(`https://shop.tl-academy.ee/api/products/${productId}`, {
       data: requestBody,
     })
     const responseBody = await response.json()
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('PATCH response status:', statusCode)
+    console.log('PATCH response body:', responseBody)
     expect(statusCode).toBe(200)
     expect(typeof responseBody.name).toBe('string')
     expect(typeof responseBody.price).toBe('number')
@@ -333,21 +388,35 @@ test.describe('PATCH /products/{id}', () => {
     expect(typeof responseBody.available).toBe('boolean')
   })
 
-  test('Changing all required fields using command PATCH should receive code 200', async ({
-    request,
-  }) => {
-    const requestBody = {
-      name: 'Patch name2',
-      category: 'Patch category2',
-      price: 233,
+  test('Changing all required fields using command PATCH should receive code 200', async ({request, }) => {
+    //Create new product
+    const newProduct = {
+      name: 'Fanta',
+      category: 'Drinks',
+      price: 6453241546,
     }
-    const response = await request.patch('https://shop.tl-academy.ee/api/products/5', {
+    const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+      data: newProduct,
+    })
+    const createdProductBody = await postResponse.json()
+    const productStatusCode = postResponse.status()
+    const productId = createdProductBody.id
+    console.log('POST response status:', productStatusCode)
+    console.log('POST response body:', createdProductBody)
+    expect(productStatusCode).toBe(StatusCodes.CREATED)
+    //Change product
+    const requestBody = {
+      name: 'Jaffa',
+      category: 'Juice',
+      price: 5,
+    }
+    const response = await request.patch(`https://shop.tl-academy.ee/api/products/${productId}`, {
       data: requestBody,
     })
     const responseBody = await response.json()
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('PATCH response status:', statusCode)
+    console.log('PATCH response body:', responseBody)
     expect(statusCode).toBe(200)
     expect(typeof responseBody.name).toBe('string')
     expect(typeof responseBody.price).toBe('number')
@@ -360,61 +429,110 @@ test.describe('PATCH /products/{id}', () => {
   test.fail(
     'Using command PATCH with blank request body should receive code 400',
     async ({ request }) => {
+      //Create new product
+      const newProduct = {
+        name: 'Apple',
+        category: 'Iphone',
+        price: 784,
+      }
+      const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+        data: newProduct,
+      })
+      const createdProductBody = await postResponse.json()
+      const productStatusCode = postResponse.status()
+      const productId = createdProductBody.id
+      console.log('POST response status:', productStatusCode)
+      console.log('POST response body:', createdProductBody)
+      expect(productStatusCode).toBe(StatusCodes.CREATED)
+      //Change product
       const requestBody = {}
-      const response = await request.patch('https://shop.tl-academy.ee/api/products/1', {
+      const response = await request.patch(`https://shop.tl-academy.ee/api/products/${productId}`, {
         data: requestBody,
       })
       const responseBody = await response.json()
       const statusCode = response.status()
-      console.log('response status:', statusCode)
-      console.log('response body:', responseBody)
+      console.log('PATCH response status:', statusCode)
+      console.log('PATCH response body:', responseBody)
       expect(statusCode).toBe(StatusCodes.BAD_REQUEST)
     },
   )
 
-  test('Changing required field with invalid information using command PATCH should receive code 400', async ({
-    request,
-  }) => {
+  test('Changing required field with invalid information using command PATCH should receive code 400', async ({request, }) => {
+    //Create new product
+    const newProduct = {
+      name: 'Drumsticks',
+      category: 'Tree',
+      price: 0,
+    }
+    const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+      data: newProduct,
+    })
+    const createdProductBody = await postResponse.json()
+    const productStatusCode = postResponse.status()
+    const productId = createdProductBody.id
+    console.log('POST response status:', productStatusCode)
+    console.log('POST response body:', createdProductBody)
+    expect(productStatusCode).toBe(StatusCodes.CREATED)
+    //Change product
     const requestBody = {
       name: 424,
     }
-    const response = await request.patch('https://shop.tl-academy.ee/api/products/4', {
+    const response = await request.patch(`https://shop.tl-academy.ee/api/products/${productId}`, {
       data: requestBody,
     })
     const responseBody = await response.json()
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('PATCH response status:', statusCode)
+    console.log('PATCH response body:', responseBody)
     expect(statusCode).toBe(StatusCodes.BAD_REQUEST)
   })
 })
 
 test.describe('DELETE /products/{id}', () => {
   test('Delete product with correct id should receive code 204', async ({ request }) => {
-    const response = await request.delete('https://shop.tl-academy.ee/api/products/1')
-    const responseBody = await response.text()
+    //Create new product
+    const newProduct = {
+      name: 'Shampoo',
+      category: 'Care',
+      price: 0,
+    }
+    const postResponse = await request.post('https://shop.tl-academy.ee/api/products/', {
+      data: newProduct,
+    })
+    const createdProductBody = await postResponse.json()
+    const productStatusCode = postResponse.status()
+    const productId = createdProductBody.id
+    console.log('POST response status:', productStatusCode)
+    console.log('POST response body:', createdProductBody)
+    expect(productStatusCode).toBe(StatusCodes.CREATED)
+    //Delete product
+    const response = await request.delete(`https://shop.tl-academy.ee/api/products/${productId}`)
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('DELETE response status:', statusCode)
     expect(statusCode).toBe(204)
   })
 
   test('Delete product with incorrect id should receive code 400', async ({ request }) => {
     const response = await request.delete('https://shop.tl-academy.ee/api/products/sadasdasd')
-    const responseBody = await response.text()
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('DELETE response status:', statusCode)
     expect(statusCode).toBe(StatusCodes.BAD_REQUEST)
   })
 
   //бага, удаляет то, чего нет
   test.fail('Delete product with not existing id should receive code 404', async ({ request }) => {
-    const response = await request.delete('https://shop.tl-academy.ee/api/products/546546546')
-    const responseBody = await response.text()
+    //Get all products and the last one
+    const allProductResponse = await request.get('https://shop.tl-academy.ee/api/products')
+    const allProductBody = await allProductResponse.json()
+
+    const maxProductId = Math.max(...allProductBody.map((product: { id: number }) => product.id))
+    const nonExistingProductId = maxProductId + 1
+    //Change product
+    const response = await request.delete(
+      `https://shop.tl-academy.ee/api/products/${nonExistingProductId}`,
+    )
     const statusCode = response.status()
-    console.log('response status:', statusCode)
-    console.log('response body:', responseBody)
+    console.log('DELETE response status:', statusCode)
     expect(statusCode).toBe(StatusCodes.NOT_FOUND)
   })
 })
