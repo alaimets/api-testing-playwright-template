@@ -294,7 +294,9 @@ test.describe('PUT /products/{id}', () => {
     expect(statusCode).toBe(200)
   })
 
-  test('Change one field in the product using PUT command should receive code 400', async ({request, }) => {
+  test('Change one field in the product using PUT command should receive code 400', async ({
+    request,
+  }) => {
     //Create new product
     const newProduct = {
       name: 'Mozzarella',
@@ -324,10 +326,12 @@ test.describe('PUT /products/{id}', () => {
     expect(statusCode).toBe(400)
   })
 
-  test('Change whole product using PUT command with not existing id should receive code 404', async ({request, }) => {
-   //Get all products and the last one
+  test('Change whole product using PUT command with not existing id should receive code 404', async ({
+    request,
+  }) => {
+    //Get all products and the last one
     const allProductResponse = await request.get('https://shop.tl-academy.ee/api/products')
-    const allProductBody= await allProductResponse.json()
+    const allProductBody = await allProductResponse.json()
 
     const maxProductId = Math.max(...allProductBody.map((product: { id: number }) => product.id))
     const nonExistingProductId = maxProductId + 1
@@ -388,7 +392,9 @@ test.describe('PATCH /products/{id}', () => {
     expect(typeof responseBody.available).toBe('boolean')
   })
 
-  test('Changing all required fields using command PATCH should receive code 200', async ({request, }) => {
+  test('Changing all required fields using command PATCH should receive code 200', async ({
+    request,
+  }) => {
     //Create new product
     const newProduct = {
       name: 'Fanta',
@@ -457,7 +463,9 @@ test.describe('PATCH /products/{id}', () => {
     },
   )
 
-  test('Changing required field with invalid information using command PATCH should receive code 400', async ({request, }) => {
+  test('Changing required field with invalid information using command PATCH should receive code 400', async ({
+    request,
+  }) => {
     //Create new product
     const newProduct = {
       name: 'Drumsticks',

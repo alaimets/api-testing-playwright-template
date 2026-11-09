@@ -43,7 +43,9 @@ test.describe('POST /api/accounts', () => {
 
   const currencies = ['USD', 'EUR', 'GBP']
 
-  test(`TL-11-2 POST /api/accounts with valid data and all supported currencies: ${currencies}`, async ({ request, }) => {
+  test(`TL-11-2 POST /api/accounts with valid data and all supported currencies: ${currencies}`, async ({
+    request,
+  }) => {
     for (const currency of currencies) {
       const account = new AccountDTO('Test Owner', currency)
       const response = await request.post(baseUrl + '/api/accounts', {
@@ -76,7 +78,9 @@ test.describe('POST /api/accounts negative tests', () => {
     expect.soft(respBody.error.length).toBeGreaterThan(0)
   })
 
-  test('TL-11-4 POST /api/accounts without authHeader should receive code 401', async ({ request }) => {
+  test('TL-11-4 POST /api/accounts without authHeader should receive code 401', async ({
+    request,
+  }) => {
     const account = new AccountDTO('Test Owner', 'EUR')
     const response = await request.post(baseUrl + '/api/accounts', {
       data: account,
@@ -87,7 +91,9 @@ test.describe('POST /api/accounts negative tests', () => {
     expect.soft(response.status()).toBe(401)
   })
 
-  test('TL-11-5 POST /api/accounts with invalid authHeader should receive code 401', async ({ request, }) => {
+  test('TL-11-5 POST /api/accounts with invalid authHeader should receive code 401', async ({
+    request,
+  }) => {
     const authHeaderInvalid = {
       'X-API-KEY': 'my-api-key2',
     }
@@ -114,7 +120,9 @@ test.describe('GET /api/accounts', () => {
     expect(statusCode).toBe(StatusCodes.OK)
   })
 
-  test('TL-11-7 Get full list of accounts without authHeader should receive code 401', async ({ request }) => {
+  test('TL-11-7 Get full list of accounts without authHeader should receive code 401', async ({
+    request,
+  }) => {
     const response = await request.get(baseUrl + '/api/accounts', {})
     const responseBody = await response.json()
     const statusCode = response.status()
@@ -122,7 +130,9 @@ test.describe('GET /api/accounts', () => {
     expect(statusCode).toBe(401)
   })
 
-  test('TL-11-8 Get full list of accounts with invalid authHeader should receive code 401', async ({ request, }) => {
+  test('TL-11-8 Get full list of accounts with invalid authHeader should receive code 401', async ({
+    request,
+  }) => {
     const authHeaderInvalid = {
       'X-API-KEY': 'my-api-key2',
     }
@@ -170,11 +180,13 @@ test.describe('GET /api/accounts/{id}', () => {
 })
 
 test.describe('POST /api/accounts/{id}/deposit', () => {
-  test('TL-11-12 Deposit valid amount to the account should receive code 200', async ({ request }) => {
+  test('TL-11-12 Deposit valid amount to the account should receive code 200', async ({
+    request,
+  }) => {
     const amount: number = 100
     const response = await request.post(baseUrl + '/api/accounts/1/deposit', {
       headers: authHeader,
-      data: {amount: amount},
+      data: { amount: amount },
     })
     const responseBody = await response.json()
     const statusCode = response.status()
@@ -182,9 +194,7 @@ test.describe('POST /api/accounts/{id}/deposit', () => {
     expect(statusCode).toBe(StatusCodes.OK)
   })
 
-  test('TL-11-13 Deposit 0 to the account should receive code 400', async ({
-    request,
-  }) => {
+  test('TL-11-13 Deposit 0 to the account should receive code 400', async ({ request }) => {
     const amount: number = 0
     const response = await request.post(baseUrl + '/api/accounts/1/deposit', {
       headers: authHeader,
@@ -196,7 +206,9 @@ test.describe('POST /api/accounts/{id}/deposit', () => {
     expect(statusCode).toBe(StatusCodes.BAD_REQUEST)
   })
 
-  test('TL-11-14 Deposit amount with invalid data to the account should receive code 400', async ({ request }) => {
+  test('TL-11-14 Deposit amount with invalid data to the account should receive code 400', async ({
+    request,
+  }) => {
     const amount = 'hjgjgjh'
     const response = await request.post(baseUrl + '/api/accounts/1/deposit', {
       headers: authHeader,
@@ -222,7 +234,9 @@ test.describe('POST /api/accounts/{id}/deposit', () => {
     expect(statusCode).toBe(StatusCodes.BAD_REQUEST)
   })
 
-  test('TL-11-16 Deposit correct amount to not existing account should receive code 404', async ({ request, }) => {
+  test('TL-11-16 Deposit correct amount to not existing account should receive code 404', async ({
+    request,
+  }) => {
     const amount: number = 100
     const nonExistingId = Math.floor(Math.random() * 1000) + 1000
     const response = await request.post(baseUrl + `/api/accounts/${nonExistingId}/deposit`, {
